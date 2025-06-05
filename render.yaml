@@ -11,18 +11,14 @@ services:
         value: 10000
       - key: JWT_SECRET
         generateValue: true
-      - key: MONGODB_URI
-        fromService:
-          type: mongodb
-          name: pizzaria-db
-          property: connectionString
     autoDeploy: true
     healthCheckPath: /api/health
     healthCheckTimeout: 300
 
-databases:
   - type: mongodb
     name: pizzaria-db
-    databaseName: pizzaria_livia
+    plan: free
     ipAllowList: []
-    plan: free 
+    envVars:
+      - key: MONGODB_URI
+        value: ${MONGODB_URI} 

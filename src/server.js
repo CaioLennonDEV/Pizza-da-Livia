@@ -20,7 +20,14 @@ app.get('/api/health', (req, res) => {
 // Database connection
 const connectDB = async () => {
   try {
-    const mongoURI = process.env.MONGODB_URI;
+    // Log all environment variables starting with MONGODB
+    Object.keys(process.env).forEach(key => {
+      if (key.startsWith('MONGODB')) {
+        console.log(`Found MongoDB-related env var: ${key}`);
+      }
+    });
+
+    const mongoURI = process.env.MONGODB_URI || process.env.RENDER_MONGODB_URI;
     
     console.log('MongoDB URI exists:', !!mongoURI);
     
@@ -32,7 +39,9 @@ const connectDB = async () => {
     
     await mongoose.connect(mongoURI, {
       useNewUrlParser: true,
-      useUnifiedTopology: true
+      useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 30000, // Increase timeout to 30 seconds
+      socketTimeoutMS: 45000, // Increase socket timeout to 45 seconds
     });
     
     console.log('📦 Connected to MongoDB successfully');
@@ -40,7 +49,8 @@ const connectDB = async () => {
     console.error('MongoDB connection error details:', {
       message: err.message,
       code: err.code,
-      name: err.name
+      name: err.name,
+      stack: err.stack
     });
     
     // Retry connection after 5 seconds
@@ -57,7 +67,11 @@ mongoose.connection.on('connected', () => {
 });
 
 mongoose.connection.on('error', (err) => {
-  console.error('Mongoose connection error:', err);
+  console.error('Mongoose connection error:', {
+    message: err.message,
+    code: err.code,
+    name: err.name
+  });
   setTimeout(connectDB, 5000);
 });
 
@@ -79,12 +93,12 @@ app.use('/api/users', userRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  console.error('Application error:', err.stack);
   res.status(500).json({ message: 'Algo deu errado!' });
 });
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
-  console.log('Environment variables available:', Object.keys(process.env));
+  console.log('Available environment variables:', Object.keys(process.env).sort());
 }); 
