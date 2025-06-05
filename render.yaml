@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: pizzaria-da-livia
+    env: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: MONGODB_URI
+        fromDatabase:
+          name: pizzaria-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+    autoDeploy: true
+    healthCheckPath: /api/health
+
+databases:
+  - name: pizzaria-db
+    databaseName: pizzaria-livia
+    ipAllowList: []
+    plan: free 
