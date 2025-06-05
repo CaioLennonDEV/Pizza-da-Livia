@@ -20,6 +20,6 @@ services:
 
 databases:
   - name: pizzaria-db
-    databaseName: pizzaria-livia
+    databaseName: pizzaria_livia
     ipAllowList: []
     plan: free 
