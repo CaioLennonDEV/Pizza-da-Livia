@@ -17,6 +17,9 @@ services:
         generateValue: true
     autoDeploy: true
     healthCheckPath: /api/health
+    initialDeployHooks:
+      - command: sleep 10 # Wait for database to be ready
+    healthCheckTimeout: 300
 
 databases:
   - name: pizzaria-db
