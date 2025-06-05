@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pizzaria da Livia</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <nav class="nav-container">
+            <div class="logo">
+                <img src="/assets/images/logo.png" alt="Pizzaria da Livia">
+            </div>
+            <div class="nav-links">
+                <a href="#" class="nav-link active" data-page="home">Início</a>
+                <a href="#" class="nav-link" data-page="menu">Cardápio</a>
+                <a href="#" class="nav-link" data-page="orders">Meus Pedidos</a>
+                <a href="#" class="nav-link" data-page="profile" id="profileLink">Perfil</a>
+            </div>
+            <div class="nav-actions">
+                <button id="cartButton" class="cart-button">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count">0</span>
+                </button>
+                <button id="loginButton" class="login-button">Entrar</button>
+            </div>
+        </nav>
+    </header>
+
+    <main id="mainContent">
+        <!-- Conteúdo dinâmico será carregado aqui -->
+    </main>
+
+    <!-- Modal de Login -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div class="auth-container">
+                <div class="auth-tabs">
+                    <button class="auth-tab active" data-tab="login">Login</button>
+                    <button class="auth-tab" data-tab="register">Cadastro</button>
+                </div>
+                
+                <form id="loginForm" class="auth-form">
+                    <div class="form-group">
+                        <label for="loginEmail">Email</label>
+                        <input type="email" id="loginEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Senha</label>
+                        <input type="password" id="loginPassword" required>
+                    </div>
+                    <button type="submit" class="btn-primary">Entrar</button>
+                </form>
+
+                <form id="registerForm" class="auth-form hidden">
+                    <div class="form-group">
+                        <label for="registerName">Nome</label>
+                        <input type="text" id="registerName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerEmail">Email</label>
+                        <input type="email" id="registerEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPassword">Senha</label>
+                        <input type="password" id="registerPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPhone">Telefone</label>
+                        <input type="tel" id="registerPhone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerStreet">Rua</label>
+                        <input type="text" id="registerStreet" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="registerNumber">Número</label>
+                            <input type="text" id="registerNumber" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="registerComplement">Complemento</label>
+                            <input type="text" id="registerComplement">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerNeighborhood">Bairro</label>
+                        <input type="text" id="registerNeighborhood" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="registerCity">Cidade</label>
+                            <input type="text" id="registerCity" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="registerState">Estado</label>
+                            <input type="text" id="registerState" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerZipCode">CEP</label>
+                        <input type="text" id="registerZipCode" required>
+                    </div>
+                    <button type="submit" class="btn-primary">Cadastrar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal do Carrinho -->
+    <div id="cartModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Carrinho de Compras</h2>
+            <div id="cartItems" class="cart-items">
+                <!-- Itens do carrinho serão adicionados aqui -->
+            </div>
+            <div class="cart-summary">
+                <div class="subtotal">
+                    <span>Subtotal:</span>
+                    <span id="cartSubtotal">R$ 0,00</span>
+                </div>
+                <div class="delivery-fee">
+                    <span>Taxa de entrega:</span>
+                    <span id="deliveryFee">R$ 5,00</span>
+                </div>
+                <div class="total">
+                    <span>Total:</span>
+                    <span id="cartTotal">R$ 0,00</span>
+                </div>
+            </div>
+            <button id="checkoutButton" class="btn-primary">Finalizar Pedido</button>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Pizzaria da Livia</h3>
+                <p>A melhor pizza da cidade!</p>
+            </div>
+            <div class="footer-section">
+                <h3>Contato</h3>
+                <p><i class="fas fa-phone"></i> (27) 99999-9999</p>
+                <p><i class="fas fa-envelope"></i> contato@pizzarialivia.com</p>
+            </div>
+            <div class="footer-section">
+                <h3>Horário de Funcionamento</h3>
+                <p>Segunda a Domingo</p>
+                <p>18:00 - 23:00</p>
+            </div>
+            <div class="footer-section">
+                <h3>Redes Sociais</h3>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-whatsapp"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Pizzaria da Livia. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/cart.js"></script>
+    <script src="/js/app.js"></script>
+</body>
+</html> 
