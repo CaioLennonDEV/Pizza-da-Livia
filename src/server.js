@@ -20,8 +20,9 @@ app.get('/api/health', (req, res) => {
 // Database connection
 const connectDB = async () => {
   try {
-    // Check for Render's internal database URL first
-    const mongoURI = process.env.RENDER_DATABASE_URL || process.env.MONGODB_URI;
+    const mongoURI = process.env.MONGODB_URI;
+    
+    console.log('MongoDB URI exists:', !!mongoURI);
     
     if (!mongoURI) {
       throw new Error('MongoDB URI is not defined in environment variables');
@@ -31,14 +32,17 @@ const connectDB = async () => {
     
     await mongoose.connect(mongoURI, {
       useNewUrlParser: true,
-      useUnifiedTopology: true,
-      serverSelectionTimeoutMS: 5000,
-      retryWrites: true,
-      w: 'majority'
+      useUnifiedTopology: true
     });
-    console.log('📦 Connected to MongoDB');
+    
+    console.log('📦 Connected to MongoDB successfully');
   } catch (err) {
-    console.error('MongoDB connection error:', err);
+    console.error('MongoDB connection error details:', {
+      message: err.message,
+      code: err.code,
+      name: err.name
+    });
+    
     // Retry connection after 5 seconds
     setTimeout(connectDB, 5000);
   }
@@ -47,14 +51,18 @@ const connectDB = async () => {
 // Initial database connection
 connectDB();
 
-// Handle MongoDB connection errors
+// Handle MongoDB connection events
+mongoose.connection.on('connected', () => {
+  console.log('Mongoose connected to MongoDB');
+});
+
 mongoose.connection.on('error', (err) => {
-  console.error('MongoDB connection error:', err);
+  console.error('Mongoose connection error:', err);
   setTimeout(connectDB, 5000);
 });
 
 mongoose.connection.on('disconnected', () => {
-  console.log('MongoDB disconnected. Attempting to reconnect...');
+  console.log('Mongoose disconnected from MongoDB');
   setTimeout(connectDB, 5000);
 });
 
@@ -78,4 +86,5 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
+  console.log('Environment variables available:', Object.keys(process.env));
 }); 
