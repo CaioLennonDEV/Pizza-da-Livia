@@ -1,66 +1,76 @@
-const mongoose = require('mongoose');
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/database');
 
-const sizeSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-    enum: ['Pequena', 'Média', 'Grande', 'Família']
+const Product = sequelize.define('Product', {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
   },
-  price: {
-    type: Number,
-    required: true
-  }
-});
-
-const productSchema = new mongoose.Schema({
   name: {
-    type: String,
-    required: [true, 'Nome do produto é obrigatório'],
-    trim: true
+    type: DataTypes.STRING,
+    allowNull: false,
+    validate: {
+      notEmpty: { msg: 'Nome do produto é obrigatório' }
+    }
   },
   description: {
-    type: String,
-    required: [true, 'Descrição do produto é obrigatória']
+    type: DataTypes.TEXT,
+    allowNull: false,
+    validate: {
+      notEmpty: { msg: 'Descrição do produto é obrigatória' }
+    }
   },
   category: {
-    type: String,
-    required: true,
-    enum: ['Pizza', 'Bebida', 'Acompanhamento']
+    type: DataTypes.ENUM('Pizza', 'Bebida', 'Acompanhamento'),
+    allowNull: false
   },
-  ingredients: [{
-    type: String,
-    required: function() {
-      return this.category === 'Pizza';
+  ingredients: {
+    type: DataTypes.TEXT,
+    get() {
+      const rawValue = this.getDataValue('ingredients');
+      return rawValue ? JSON.parse(rawValue) : [];
+    },
+    set(value) {
+      this.setDataValue('ingredients', JSON.stringify(value));
     }
-  }],
+  },
   image: {
-    type: String,
-    required: [true, 'Imagem do produto é obrigatória']
+    type: DataTypes.STRING,
+    allowNull: false
   },
   sizes: {
-    type: [sizeSchema],
-    required: function() {
-      return this.category === 'Pizza';
+    type: DataTypes.TEXT,
+    get() {
+      const rawValue = this.getDataValue('sizes');
+      return rawValue ? JSON.parse(rawValue) : [];
+    },
+    set(value) {
+      this.setDataValue('sizes', JSON.stringify(value));
     }
   },
   price: {
-    type: Number,
-    required: function() {
-      return this.category !== 'Pizza';
+    type: DataTypes.FLOAT,
+    validate: {
+      isNumeric: { msg: 'Preço deve ser um número' }
     }
   },
   available: {
-    type: Boolean,
-    default: true
+    type: DataTypes.BOOLEAN,
+    defaultValue: true
   },
   featured: {
-    type: Boolean,
-    default: false
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
   },
   createdAt: {
-    type: Date,
-    default: Date.now
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW
+  },
+  updatedAt: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW
   }
 });
 
-module.exports = mongoose.model('Product', productSchema); 
+module.exports = Product; 

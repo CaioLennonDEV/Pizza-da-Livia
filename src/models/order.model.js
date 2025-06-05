@@ -1,111 +1,133 @@
-const mongoose = require('mongoose');
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/database');
 
-const orderItemSchema = new mongoose.Schema({
-  product: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Product',
-    required: true
+const OrderItem = sequelize.define('OrderItem', {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
+  orderId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: 'Orders',
+      key: 'id'
+    }
+  },
+  productId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: 'Products',
+      key: 'id'
+    }
   },
   quantity: {
-    type: Number,
-    required: true,
-    min: 1
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    validate: {
+      min: 1
+    }
   },
   size: {
-    type: String,
-    enum: ['Pequena', 'Média', 'Grande', 'Família'],
-    required: function() {
-      return this.category === 'Pizza';
-    }
+    type: DataTypes.ENUM('Pequena', 'Média', 'Grande', 'Família')
   },
   price: {
-    type: Number,
-    required: true
+    type: DataTypes.FLOAT,
+    allowNull: false
   },
-  observations: String
+  observations: {
+    type: DataTypes.TEXT
+  }
 });
 
-const orderSchema = new mongoose.Schema({
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+const Order = sequelize.define('Order', {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
   },
-  items: [orderItemSchema],
+  userId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: 'Users',
+      key: 'id'
+    }
+  },
   status: {
-    type: String,
-    enum: ['Pendente', 'Confirmado', 'Em Preparo', 'Saiu para Entrega', 'Entregue', 'Cancelado'],
-    default: 'Pendente'
+    type: DataTypes.ENUM('Pendente', 'Confirmado', 'Em Preparo', 'Saiu para Entrega', 'Entregue', 'Cancelado'),
+    defaultValue: 'Pendente'
   },
   totalAmount: {
-    type: Number,
-    required: true
+    type: DataTypes.FLOAT,
+    allowNull: false
   },
-  deliveryAddress: {
-    street: {
-      type: String,
-      required: true
-    },
-    number: {
-      type: String,
-      required: true
-    },
-    complement: String,
-    neighborhood: {
-      type: String,
-      required: true
-    },
-    city: {
-      type: String,
-      required: true
-    },
-    state: {
-      type: String,
-      required: true
-    },
-    zipCode: {
-      type: String,
-      required: true
-    }
+  street: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  number: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  complement: {
+    type: DataTypes.STRING
+  },
+  neighborhood: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  city: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  state: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  zipCode: {
+    type: DataTypes.STRING,
+    allowNull: false
   },
   paymentMethod: {
-    type: String,
-    enum: ['Dinheiro', 'Cartão de Crédito', 'Cartão de Débito', 'PIX'],
-    required: true
+    type: DataTypes.ENUM('Dinheiro', 'Cartão de Crédito', 'Cartão de Débito', 'PIX'),
+    allowNull: false
   },
   changeNeeded: {
-    type: Number,
-    required: function() {
-      return this.paymentMethod === 'Dinheiro';
-    }
+    type: DataTypes.FLOAT
   },
   deliveryFee: {
-    type: Number,
-    required: true,
-    default: 0
+    type: DataTypes.FLOAT,
+    allowNull: false,
+    defaultValue: 0
   },
   createdAt: {
-    type: Date,
-    default: Date.now
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW
   },
   estimatedDeliveryTime: {
-    type: Date
+    type: DataTypes.DATE
   },
   deliveredAt: {
-    type: Date
+    type: DataTypes.DATE
+  }
+}, {
+  hooks: {
+    beforeCreate: (order) => {
+      if (order.status === 'Confirmado' && !order.estimatedDeliveryTime) {
+        order.estimatedDeliveryTime = new Date(Date.now() + 45 * 60000);
+      }
+      if (order.status === 'Entregue' && !order.deliveredAt) {
+        order.deliveredAt = new Date();
+      }
+    }
   }
 });
 
-// Middleware para calcular o tempo estimado de entrega
-orderSchema.pre('save', function(next) {
-  if (this.status === 'Confirmado' && !this.estimatedDeliveryTime) {
-    // Adiciona 45 minutos ao tempo atual
-    this.estimatedDeliveryTime = new Date(Date.now() + 45 * 60000);
-  }
-  if (this.status === 'Entregue' && !this.deliveredAt) {
-    this.deliveredAt = new Date();
-  }
-  next();
-});
+// Definindo os relacionamentos
+Order.hasMany(OrderItem, { as: 'items', foreignKey: 'orderId' });
+OrderItem.belongsTo(Order, { foreignKey: 'orderId' });
 
-module.exports = mongoose.model('Order', orderSchema); 
+module.exports = { Order, OrderItem }; 
