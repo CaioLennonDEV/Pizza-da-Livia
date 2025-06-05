@@ -20,11 +20,15 @@ app.get('/api/health', (req, res) => {
 // Database connection
 const connectDB = async () => {
   try {
-    const mongoURI = process.env.MONGODB_URI;
+    // Check for Render's internal database URL first
+    const mongoURI = process.env.RENDER_DATABASE_URL || process.env.MONGODB_URI;
+    
     if (!mongoURI) {
       throw new Error('MongoDB URI is not defined in environment variables');
     }
 
+    console.log('Attempting to connect to MongoDB...');
+    
     await mongoose.connect(mongoURI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,

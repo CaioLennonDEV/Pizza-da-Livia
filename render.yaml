@@ -8,11 +8,7 @@ services:
       - key: NODE_ENV
         value: production
       - key: PORT
-        value: 3000
-      - key: MONGODB_URI
-        fromDatabase:
-          name: pizzaria-db
-          property: connectionString
+        value: 10000
       - key: JWT_SECRET
         generateValue: true
     autoDeploy: true
@@ -20,6 +16,8 @@ services:
     initialDeployHooks:
       - command: sleep 10 # Wait for database to be ready
     healthCheckTimeout: 300
+    dependencies:
+      - name: pizzaria-db
 
 databases:
   - name: pizzaria-db
