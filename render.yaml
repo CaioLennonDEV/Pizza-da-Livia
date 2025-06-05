@@ -11,14 +11,15 @@ services:
         value: 10000
       - key: JWT_SECRET
         generateValue: true
+      - key: MONGODB_URI
+        sync: false # Permite que o valor seja definido manualmente no dashboard
     autoDeploy: true
     healthCheckPath: /api/health
     healthCheckTimeout: 300
 
-  - type: mongodb
-    name: pizzaria-db
+databases:
+  - name: pizzaria-mongodb
+    databaseName: pizzaria
     plan: free
-    ipAllowList: []
-    envVars:
-      - key: MONGODB_URI
-        value: ${MONGODB_URI} 
+    postDeploy:
+      - echo "MongoDB database deployed!" 
